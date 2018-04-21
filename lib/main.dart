@@ -10,20 +10,19 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-      title: 'No More Zero Days!',
-      theme: new ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or press Run > Flutter Hot Reload in IntelliJ). Notice that the
-        // counter didn't reset back to zero; the application is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: new Scaffold(body: new NoZeroDays(title: 'No Zero Days!'))
-    );
+        title: 'No More Zero Days!',
+        theme: new ThemeData(
+          // This is the theme of your application.
+          //
+          // Try running your application with "flutter run". You'll see the
+          // application has a blue toolbar. Then, without quitting the app, try
+          // changing the primarySwatch below to Colors.green and then invoke
+          // "hot reload" (press "r" in the console where you ran "flutter run",
+          // or press Run > Flutter Hot Reload in IntelliJ). Notice that the
+          // counter didn't reset back to zero; the application is not restarted.
+          primarySwatch: Colors.blue,
+        ),
+        home: new Scaffold(body: new NoZeroDays(title: 'No Zero Days!')));
   }
 }
 
@@ -46,24 +45,33 @@ class NoZeroDays extends StatefulWidget {
 }
 
 class _NoZeroDaysState extends State<NoZeroDays> {
-  static List<Entry> _firstEntry = <Entry>[Entry(new DateTime.now(), "Made this!")];
+  static List<Entry> _firstEntry = <Entry>[
+    Entry(new DateTime.now(), "Made this!")
+  ];
   List<Entry> _zerodayslist = new List<Entry>.from(_firstEntry);
 
   Future<DateTime> _currentDatePicker() {
     int currentYear = new DateTime.now().year;
     return showDatePicker(
-            context: (context),
-            initialDate: new DateTime.now(),
-            firstDate: new DateTime(currentYear),
-            lastDate: new DateTime(currentYear + 1));
+        context: (context),
+        initialDate: new DateTime.now(),
+        firstDate: new DateTime(currentYear),
+        lastDate: new DateTime(currentYear + 1));
   }
 
   Widget _buildFAB() {
     return new FloatingActionButton(
       onPressed: () {
         Future<DateTime> pickedDate = _currentDatePicker();
-        pickedDate.then((value) => _zerodayslist.add(Entry(value, "nothing")))
-            .catchError((err) => Scaffold.of(context).showSnackBar(new SnackBar(content: new Text(err.toString()))));
+        pickedDate.then((value) {
+          setState(() {
+            if (value != null) _zerodayslist.add(Entry(value, "nothing"));
+          });
+        }).catchError((err) {
+          Scaffold
+              .of(context)
+              .showSnackBar(new SnackBar(content: new Text(err.toString())));
+        });
       },
       tooltip: 'Make a new entry',
       child: new Icon(Icons.add),
@@ -76,9 +84,8 @@ class _NoZeroDaysState extends State<NoZeroDays> {
       onTap: () {
         //edit entry
       },
-      trailing: new Icon(
-        Icons.edit
-      ),);
+      trailing: new Icon(Icons.edit),
+    );
   }
 
   @override
@@ -90,13 +97,18 @@ class _NoZeroDaysState extends State<NoZeroDays> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return new Scaffold(
-        appBar: new AppBar(
-          title: new Text(widget.title),
-        ),
-        body: new Scaffold(body: new ListView(
-            children: new List<Widget>.from(_zerodayslist.map((entry) => _buildRow(entry)), growable: true),
-        )),
+      appBar: new AppBar(
+        title: new Text(widget.title),
+      ),
+      body: new Scaffold(body: new ListView.builder(
+        itemBuilder: (context, entry) {
+          if (entry < _zerodayslist.length) {
+            return _buildRow(_zerodayslist[entry]);
+          } else
+            return new ListTile();
+        },
+      )),
       floatingActionButton: _buildFAB(),
-        );
+    );
   }
 }
