@@ -7,12 +7,12 @@ class Entry {
   Entry(this.date, this.whatYouDid);
 
   Entry.fromJson(Map<String, dynamic> json)
-    : date = json['date'],
+    : date = DateTime.parse(json['date']),
       whatYouDid = json['whatyoudid'];
 
   Map<String, dynamic> toJson() =>
       {
-        'date': date,
+        'date': date.toString(),
         'whatyoudid': whatYouDid,
       };
 

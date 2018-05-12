@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:nomorezerodays/Entry.dart';
+import 'package:nomorezerodays/FileLoader.dart';
 
 class NoZeroDays extends StatefulWidget {
   NoZeroDays({Key key, this.title}) : super(key: key);
@@ -86,7 +88,6 @@ class _NoZeroDaysState extends State<NoZeroDays> {
                             .add(new Entry(newValue, entry.whatYouDid));
                       });
                     }
-                    ;
                     Navigator.pop(context);
                   }).catchError((err) {
                     Scaffold.of(context).showSnackBar(
@@ -121,6 +122,30 @@ class _NoZeroDaysState extends State<NoZeroDays> {
     }));
   }
 
+  void _save() {
+    FileLoader f = new FileLoader();
+
+    f.writeFile(json.encode(_zerodayslist));
+
+  }
+
+  void _load() {
+    FileLoader f = new FileLoader();
+
+    f.readFile().then((s) {
+      print(s);
+      setState(() {
+        List<Entry> newList = <Entry>[];
+        List<dynamic> tempList = json.decode(s);
+
+        for (var i = 0; i < tempList.length; ++i) {
+          newList.add(Entry.fromJson(tempList[i]));
+        }
+        _zerodayslist = newList;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -132,6 +157,10 @@ class _NoZeroDaysState extends State<NoZeroDays> {
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(widget.title),
+        actions: <Widget>[
+          new IconButton(icon: new Icon(Icons.save), onPressed: _save),
+          new IconButton(icon: new Icon(Icons.file_upload), onPressed: _load),
+        ]
       ),
       body: new Scaffold(body: new ListView.builder(
         itemBuilder: (context, entry) {
