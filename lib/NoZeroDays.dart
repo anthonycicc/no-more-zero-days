@@ -66,46 +66,48 @@ class _NoZeroDaysState extends State<NoZeroDays> {
   }
 
   void _editEntry(Entry entry) {
-    Navigator.of(context).push(
-      new MaterialPageRoute(
-          builder: (context) {
-            final t = new Form(
-              child: new Column(
-                children: <Widget>[
-                  new IconButton(icon: new Icon(Icons.date_range), onPressed:
-            () {
-                    Future<DateTime> newDate = showDatePicker(
-                        context: (context),
-                        initialDate: entry.date,
-                        firstDate: new DateTime(DateTime.now().year),
-                        lastDate: new DateTime(DateTime.now().year + 1)
-                    );
-                    newDate.then((newValue) {
-                      setState(() {
-                        _zerodayslist.remove(entry);
-                        _zerodayslist.add(
-                            new Entry(newValue, entry.whatYouDid));
-                      });
+    Navigator.of(context).push(new MaterialPageRoute(builder: (context) {
+      final t = new Form(
+        child: new Column(
+          children: <Widget>[
+            new IconButton(
+                icon: new Icon(Icons.date_range),
+                onPressed: () {
+                  Future<DateTime> newDate = showDatePicker(
+                      context: (context),
+                      initialDate: entry.date,
+                      firstDate: new DateTime(DateTime.now().year),
+                      lastDate: new DateTime(DateTime.now().year + 1));
+                  newDate.then((newValue) {
+                    setState(() {
+                      _zerodayslist.remove(entry);
+                      _zerodayslist.add(new Entry(newValue, entry.whatYouDid));
                     });
-                  }),
-                  new TextFormField(
-                    initialValue: entry.whatYouDid,
-                    onFieldSubmitted: (newValue) {
-                      setState((){
-                        _zerodayslist.remove(entry);
-                        _zerodayslist.add(new Entry(entry.date, newValue));
-                      });
-                    },
-                  )
-                ],
-              ),
-            );
-            return new Scaffold(
-              appBar: new AppBar(title: new Text("Edit this entry")),
-              body: t,
-            );
-          })
-    );
+                  });
+                }),
+            new TextFormField(
+              initialValue: entry.whatYouDid,
+              onFieldSubmitted: (newValue) {
+                setState(() {
+                  _zerodayslist.remove(entry);
+                  _zerodayslist.add(new Entry(entry.date, newValue));
+                });
+              },
+            ),
+          ],
+        ),
+      );
+      return new Scaffold(
+        appBar: new AppBar(title: new Text("Edit this entry")),
+        body: t,
+        floatingActionButton: new FloatingActionButton(onPressed: () {
+          setState(() {_zerodayslist.remove(entry); });
+          Navigator.pop(context);
+        },
+        child: new Icon(Icons.delete)
+        ),
+      );
+    }));
   }
 
   @override
