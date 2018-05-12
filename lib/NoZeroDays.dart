@@ -79,11 +79,18 @@ class _NoZeroDaysState extends State<NoZeroDays> {
                       firstDate: new DateTime(DateTime.now().year),
                       lastDate: new DateTime(DateTime.now().year + 1));
                   newDate.then((newValue) {
-                    setState(() {
-                      _zerodayslist.remove(entry);
-                      _zerodayslist.add(new Entry(newValue, entry.whatYouDid));
-                    });
+                    if (newValue != null) {
+                      setState(() {
+                        _zerodayslist.remove(entry);
+                        _zerodayslist
+                            .add(new Entry(newValue, entry.whatYouDid));
+                      });
+                    }
+                    ;
                     Navigator.pop(context);
+                  }).catchError((err) {
+                    Scaffold.of(context).showSnackBar(
+                        new SnackBar(content: new Text(err.toString())));
                   });
                 }),
             new TextFormField(
@@ -102,12 +109,14 @@ class _NoZeroDaysState extends State<NoZeroDays> {
       return new Scaffold(
         appBar: new AppBar(title: new Text("Edit this entry")),
         body: t,
-        floatingActionButton: new FloatingActionButton(onPressed: () {
-          setState(() {_zerodayslist.remove(entry); });
-          Navigator.pop(context);
-        },
-        child: new Icon(Icons.delete)
-        ),
+        floatingActionButton: new FloatingActionButton(
+            onPressed: () {
+              setState(() {
+                _zerodayslist.remove(entry);
+              });
+              Navigator.pop(context);
+            },
+            child: new Icon(Icons.delete)),
       );
     }));
   }
