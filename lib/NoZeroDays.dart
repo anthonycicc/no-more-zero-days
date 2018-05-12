@@ -83,6 +83,7 @@ class _NoZeroDaysState extends State<NoZeroDays> {
                       _zerodayslist.remove(entry);
                       _zerodayslist.add(new Entry(newValue, entry.whatYouDid));
                     });
+                    Navigator.pop(context);
                   });
                 }),
             new TextFormField(
@@ -92,6 +93,7 @@ class _NoZeroDaysState extends State<NoZeroDays> {
                   _zerodayslist.remove(entry);
                   _zerodayslist.add(new Entry(entry.date, newValue));
                 });
+                Navigator.pop(context);
               },
             ),
           ],
