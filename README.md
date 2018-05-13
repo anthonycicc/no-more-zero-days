@@ -4,5 +4,6 @@ No more Zero Days!
 
 ## Getting Started
 
-For help getting started with Flutter, view our online
-[documentation](https://flutter.io/).
+To build, do the standard stuff in the project dir
+* `flutter build apk`
+* `flutter install`
