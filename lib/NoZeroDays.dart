@@ -31,15 +31,16 @@ class _NoZeroDaysState extends State<NoZeroDays> {
 
   List<Entry> _zerodayslist = new List<Entry>.from(_firstEntry);
 
-  void _newEntry(DateTime date, String whatyoudid){
+  void _newEntry(DateTime date, String whatyoudid) {
     int highestID = 0;
     for (var i = 0; i < _zerodayslist.length; ++i) {
-      if (_zerodayslist[i].id > highestID){
+      if (_zerodayslist[i].id > highestID) {
         highestID = _zerodayslist[i].id;
       }
     }
 
-    setState(() => _zerodayslist.add(new Entry(highestID + 1, date, whatyoudid)));
+    setState(
+        () => _zerodayslist.add(new Entry(highestID + 1, date, whatyoudid)));
 
     _save();
   }
@@ -167,20 +168,16 @@ class _NoZeroDaysState extends State<NoZeroDays> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return new Scaffold(
-      appBar: new AppBar(
-        title: new Text(widget.title),
-        actions: <Widget>[
-          new IconButton(icon: new Icon(Icons.save), onPressed: _save),
-          new IconButton(icon: new Icon(Icons.file_upload), onPressed: _load),
-        ]
-      ),
+      appBar: new AppBar(title: new Text(widget.title), actions: <Widget>[
+        new IconButton(icon: new Icon(Icons.save), onPressed: _save),
+        new IconButton(icon: new Icon(Icons.file_upload), onPressed: _load),
+      ]),
       body: new Scaffold(body: new ListView.builder(
         itemBuilder: (context, entry) {
           f.checkForFile().then((value) {
             if (value) {
               _load();
-            }
-            else {
+            } else {
               f.writeFile("");
             }
           });

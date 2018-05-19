@@ -38,5 +38,4 @@ class FileLoader {
       throw OSError("File not found");
     }
   }
-
 }
