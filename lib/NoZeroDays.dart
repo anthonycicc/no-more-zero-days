@@ -42,12 +42,12 @@ class _NoZeroDaysState extends State<NoZeroDays> {
     setState(
         () => _zerodayslist.add(new Entry(highestID + 1, date, whatyoudid)));
 
-    _save();
+    _save(context);
   }
 
   void _removeEntry(Entry entry) {
     _zerodayslist.removeWhere((testEntry) => testEntry.id == entry.id);
-    _save();
+    _save(context);
   }
 
   void _editEntry(Entry entry) {
@@ -141,8 +141,9 @@ class _NoZeroDaysState extends State<NoZeroDays> {
     );
   }
 
-  void _save() {
+  void _save(BuildContext context) {
     f.writeFile(json.encode(_zerodayslist));
+    Scaffold.of(context).showSnackBar(new SnackBar(content: new Text("Saved")));
   }
 
   void _load() {
@@ -169,7 +170,11 @@ class _NoZeroDaysState extends State<NoZeroDays> {
     // than having to individually change instances of widgets.
     return new Scaffold(
       appBar: new AppBar(title: new Text(widget.title), actions: <Widget>[
-        new IconButton(icon: new Icon(Icons.save), onPressed: _save),
+        new IconButton(
+            icon: new Icon(Icons.save),
+            onPressed: (() {
+              _save(context);
+            })),
         new IconButton(icon: new Icon(Icons.file_upload), onPressed: _load),
       ]),
       body: new Scaffold(body: new ListView.builder(
