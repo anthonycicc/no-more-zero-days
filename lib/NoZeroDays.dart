@@ -25,49 +25,32 @@ class NoZeroDays extends StatefulWidget {
 
 class _NoZeroDaysState extends State<NoZeroDays> {
   static List<Entry> _firstEntry = <Entry>[
-    Entry(new DateTime.now(), "Made this!")
+    Entry(0, new DateTime.now(), "Made this!")
   ];
+  FileLoader f = new FileLoader();
+
   List<Entry> _zerodayslist = new List<Entry>.from(_firstEntry);
 
-  Future<DateTime> _currentDatePicker() {
-    int currentYear = new DateTime.now().year;
-    return showDatePicker(
-        context: (context),
-        initialDate: new DateTime.now(),
-        firstDate: new DateTime(currentYear),
-        lastDate: new DateTime(currentYear + 1));
+  void _newEntry(DateTime date, String whatyoudid){
+    int highestID = 0;
+    for (var i = 0; i < _zerodayslist.length; ++i) {
+      if (_zerodayslist[i].id > highestID){
+        highestID = _zerodayslist[i].id;
+      }
+    }
+
+    setState(() => _zerodayslist.add(new Entry(highestID + 1, date, whatyoudid)));
+
+    _save();
   }
 
-  Widget _buildFAB() {
-    return new FloatingActionButton(
-      onPressed: () {
-        Future<DateTime> pickedDate = _currentDatePicker();
-        pickedDate.then((value) {
-          setState(() {
-            if (value != null) _zerodayslist.add(Entry(value, "nothing"));
-          });
-        }).catchError((err) {
-          Scaffold
-              .of(context)
-              .showSnackBar(new SnackBar(content: new Text(err.toString())));
-        });
-      },
-      tooltip: 'Make a new entry',
-      child: new Icon(Icons.add),
-    );
-  }
-
-  Widget _buildRow(Entry entry) {
-    return new ListTile(
-      title: new Text(entry.toString()),
-      onTap: () {
-        _editEntry(entry);
-      },
-      trailing: new Icon(Icons.edit),
-    );
+  void _removeEntry(Entry entry) {
+    _zerodayslist.removeWhere((testEntry) => testEntry.id == entry.id);
+    _save();
   }
 
   void _editEntry(Entry entry) {
+    _removeEntry(entry);
     Navigator.of(context).push(new MaterialPageRoute(builder: (context) {
       final t = new Form(
         child: new Column(
@@ -83,9 +66,7 @@ class _NoZeroDaysState extends State<NoZeroDays> {
                   newDate.then((newValue) {
                     if (newValue != null) {
                       setState(() {
-                        _zerodayslist.remove(entry);
-                        _zerodayslist
-                            .add(new Entry(newValue, entry.whatYouDid));
+                        _newEntry(newValue, entry.whatYouDid);
                       });
                     }
                     Navigator.pop(context);
@@ -98,8 +79,7 @@ class _NoZeroDaysState extends State<NoZeroDays> {
               initialValue: entry.whatYouDid,
               onFieldSubmitted: (newValue) {
                 setState(() {
-                  _zerodayslist.remove(entry);
-                  _zerodayslist.add(new Entry(entry.date, newValue));
+                  _newEntry(entry.date, newValue);
                 });
                 Navigator.pop(context);
               },
@@ -122,18 +102,50 @@ class _NoZeroDaysState extends State<NoZeroDays> {
     }));
   }
 
+  Future<DateTime> _currentDatePicker() {
+    int currentYear = new DateTime.now().year;
+    return showDatePicker(
+        context: (context),
+        initialDate: new DateTime.now(),
+        firstDate: new DateTime(currentYear),
+        lastDate: new DateTime(currentYear + 1));
+  }
+
+  Widget _buildFAB() {
+    return new FloatingActionButton(
+      onPressed: () {
+        Future<DateTime> pickedDate = _currentDatePicker();
+        pickedDate.then((value) {
+          setState(() {
+            if (value != null) _newEntry(value, "nothing");
+          });
+        }).catchError((err) {
+          Scaffold
+              .of(context)
+              .showSnackBar(new SnackBar(content: new Text(err.toString())));
+        });
+      },
+      tooltip: 'Make a new entry',
+      child: new Icon(Icons.add),
+    );
+  }
+
+  Widget _buildRow(Entry entry) {
+    return new ListTile(
+      title: new Text(entry.toString()),
+      onTap: () {
+        _editEntry(entry);
+      },
+      trailing: new Icon(Icons.edit),
+    );
+  }
+
   void _save() {
-    FileLoader f = new FileLoader();
-
     f.writeFile(json.encode(_zerodayslist));
-
   }
 
   void _load() {
-    FileLoader f = new FileLoader();
-
     f.readFile().then((s) {
-      print(s);
       setState(() {
         List<Entry> newList = <Entry>[];
         List<dynamic> tempList = json.decode(s);
@@ -164,6 +176,15 @@ class _NoZeroDaysState extends State<NoZeroDays> {
       ),
       body: new Scaffold(body: new ListView.builder(
         itemBuilder: (context, entry) {
+          f.checkForFile().then((value) {
+            if (value) {
+              _load();
+            }
+            else {
+              f.writeFile("");
+            }
+          });
+
           if (entry < _zerodayslist.length) {
             return _buildRow(_zerodayslist[entry]);
           } else

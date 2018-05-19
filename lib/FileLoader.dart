@@ -15,6 +15,12 @@ class FileLoader {
     return new File('$path/days.json');
   }
 
+  Future<bool> checkForFile() async {
+    final file = await _localFile;
+
+    return file.exists();
+  }
+
   Future<File> writeFile(String data) async {
     final file = await _localFile;
 
